@@ -51,7 +51,7 @@ Section "Dummy Section" SecDummy
   Pop $0
   DetailPrint "Installed Version of 6.0 is $0"
 
-  ;!insertmacro CheckDotNetCore 6.0
+  !insertmacro CheckDotNetCore 6.0
   ;!insertmacro CheckDotNetCore 5.0
 
   WriteRegStr HKCU "Software\DotNetCore Test" "" $INSTDIR
