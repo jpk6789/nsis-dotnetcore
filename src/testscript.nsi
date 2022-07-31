@@ -1,0 +1,55 @@
+!include "MUI2.nsh"
+!include "DotNetCore.nsh"
+
+Name "DotNetCore Macro Test Script"
+OutFile "testMacro.exe"
+
+InstallDir "$LOCALAPPDATA\DotNetCore Test" 
+InstallDirRegKey HKCU "Software\DotNetCore Test" ""
+
+RequestExecutionLevel admin
+
+!define MUI_ABORTWARNING
+
+!insertmacro MUI_PAGE_COMPONENTS
+!insertmacro MUI_PAGE_DIRECTORY
+!insertmacro MUI_PAGE_INSTFILES
+ 
+!insertmacro MUI_UNPAGE_CONFIRM
+!insertmacro MUI_UNPAGE_INSTFILES
+  
+!insertmacro MUI_LANGUAGE "English"
+
+;--------------------------------
+;Installer Sections
+
+Section "Dummy Section" SecDummy
+
+  SetOutPath "$INSTDIR"
+
+  !insertmacro DotNetCoreGetLatestVersion 3.1
+  Pop $0
+  DetailPrint "Latest Version of 3.1 is $0"
+
+  !insertmacro DotNetCoreGetLatestVersion 5.0
+  Pop $0
+  DetailPrint "Latest Version of 5.0 is $0"
+
+  !insertmacro DotNetCoreGetLatestVersion 6.0
+  Pop $0
+  DetailPrint "Latest Version of 6.0 is $0"
+
+  ;!insertmacro CheckDotNetCore 6.0
+  ;!insertmacro CheckDotNetCore 5.0
+
+  WriteRegStr HKCU "Software\DotNetCore Test" "" $INSTDIR
+  WriteUninstaller "$INSTDIR\Uninstall.exe"
+
+SectionEnd
+
+Section "Uninstall"
+
+  Delete "$INSTDIR\Uninstall.exe"
+  RMDir "$INSTDIR"
+  DeleteRegKey /ifempty HKCU "Software\DotNetCore Test"
+SectionEnd
