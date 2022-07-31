@@ -56,6 +56,30 @@ Pop $0
 
 !macroend
 
+!macro DotNetCoreGetInstalledVersion Version
+
+Push $0
+Push $1
+
+DetailPrint "Checking installed version of dotnet core ${Version}"
+
+StrCpy $0 "dotnet --list-runtimes | % { if($$_ -match $\".*WindowsDesktop.*(${Version}.\d+).*$\") { $$matches[1] } } | Sort-Object {[int]($$_ -replace '\d.\d.(\d+)', '$$1')} -Descending | Select-Object -first 1"
+!insertmacro DotNetCorePSExec $0
+Pop $1 ; $1 contains highest installed version, e.g. 6.0.7
+
+; todo error handling here
+
+; Push the result back onto the stack
+Push $1
+
+; Restore $0-1
+Exch
+Pop $1
+Exch
+Pop $0
+
+!macroend
+
 
 ; below is adapted from https://nsis.sourceforge.io/PowerShell_support but avoids using the plugin
 ; directory in favour of a temp file. Methods renamed to avoid conflicting with use of the original
