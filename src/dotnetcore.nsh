@@ -225,40 +225,9 @@ Pop $R0
 ; \param[out] Result The output from the powershell script
 !macro DotNetCorePSExec PSCommand Result
 
-  ; Save registers
-  Push $R0
-  Push $R1
-  Push $R2
-
-  ; Push and pop parameters so we don't have conflicts if parameters are $R#
-  Push ${PSCommand}
-  Pop $R0 ; Powershell command
-
-  ; Write the command into a temp file
-  ; Note: Using GetTempFileName to get a temp file name, but since we need to have a .ps1 extension
-  ; on the end we rename it with an extra file extension
-  GetTempFileName $R1
-  Rename $R1 "$R1.ps1"
-  StrCpy $R1 "$R1.ps1"
-
-  FileOpen $R2 $R1 w
-  FileWrite $R2 $R0
-  FileClose $R2
-
-  ; Execute the powershell script and delete the temp file
-  !insertmacro DotNetCorePSExecFile $R1
-  Delete $R1
-
-  ; Restore registers
-  Exch
-  Pop $R2
-  Exch
-  Pop $R1
-  Exch
-  Pop $R0
-
-  ; Set result
-  Pop ${Result}
+	Push ${PSCommand}
+	Call DotNetCorePSExecFn
+	Pop ${Result}
 
 !macroend
 
@@ -266,21 +235,72 @@ Pop $R0
 ; Executes a powershell file
 ;
 ; \param[in] FilePath The path to the powershell script file to execute
-!macro DotNetCorePSExecFile FilePath
-  !define PSExecID ${__LINE__}
-  Push $R0
+; \param[out] Result The output from the powershell script
+!macro DotNetCorePSExecFile FilePath Result
 
-  nsExec::ExecToStack 'powershell -inputformat none -ExecutionPolicy RemoteSigned -File "${FilePath}"  '
+	Push ${FilePath}
+	Call DotNetCorePSExecFileFn
+	Pop ${Result}
 
-  Pop $R0 ;return value is first on stack
-  ;script output is second on stack, leave on top of it
-  IntCmp $R0 0 finish_${PSExecID}
-  SetErrorLevel 2
-
-finish_${PSExecID}:
-  Exch ;now $R0 on top of stack, followed by script output
-  Pop $R0
-  !undef PSExecID
 !macroend
+
+Function DotNetCorePSExecFn
+
+	; Read parameters and save registers
+	Exch $R0	; Script
+	Push $R1
+	Push $R2
+
+	; Write the command into a temp file
+	; Note: Using GetTempFileName to get a temp file name, but since we need to have a .ps1 extension
+	; on the end we rename it with an extra file extension
+	GetTempFileName $R1
+	Rename $R1 "$R1.ps1"
+	StrCpy $R1 "$R1.ps1"
+
+	FileOpen $R2 $R1 w
+	FileWrite $R2 $R0
+	FileClose $R2
+
+	; Execute the powershell script and delete the temp file
+	Push $R1
+	Call DotNetCorePSExecFileFn
+	Delete $R1
+
+	; Restore registers
+	Exch
+	Pop $R2
+	Exch
+	Pop $R1
+	Exch
+	Pop $R0
+
+	; Stack contains script output only, which we leave as the function result
+
+FunctionEnd
+
+Function DotNetCorePSExecFileFn
+
+	; Read parameters and save registers
+	Exch $R0	; FilePath
+	Push $R1
+
+	nsExec::ExecToStack 'powershell -inputformat none -ExecutionPolicy RemoteSigned -File "$R0"  '
+	; Stack contain exitCode, scriptOutput, registers
+
+	; Pop exit code & validate
+	Pop $R1
+	IntCmp $R1 0 +2
+	SetErrorLevel 2
+
+	; Restore registers
+	Exch
+	Pop $R1
+	Exch
+	Pop $R0
+
+	; Stack contains script output only, which we leave as the function result
+
+FunctionEnd
 
 !endif
