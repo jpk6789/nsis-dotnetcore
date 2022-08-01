@@ -1,4 +1,5 @@
 !include "MUI2.nsh"
+!addincludedir "..\src"
 !include "DotNetCore.nsh"
 
 Name "DotNetCore Macro Test Script"
@@ -45,9 +46,9 @@ Section "Dummy Section" SecDummy
   !insertmacro DotNetCoreGetInstalledVersion 6.0 $0
   DetailPrint "Installed Version of 6.0 is $0"
 
-  ;!insertmacro CheckDotNetCore 3.1
-  ;!insertmacro CheckDotNetCore 5.0
-  ;!insertmacro CheckDotNetCore 6.0
+  !insertmacro CheckDotNetCore 3.1
+  !insertmacro CheckDotNetCore 5.0
+  !insertmacro CheckDotNetCore 6.0
 
   WriteRegStr HKCU "Software\DotNetCore Test" "" $INSTDIR
   WriteUninstaller "$INSTDIR\Uninstall.exe"
