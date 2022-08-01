@@ -179,6 +179,7 @@
 	Push $R0
 	Push $R1
 	Push $R2
+	Push $R3
 
 	; Push and pop parameters so we don't have conflicts if parameters are $R#
 	Push ${Version}
@@ -197,7 +198,7 @@
 	; Create destination file
 	GetTempFileName $R2
 	nsExec::Exec 'cmd.exe /c rename "$R2" "$R2.exe"'	; Not using Rename to avoid spam in details log
-	Pop $R0 ; Pop exit code
+	Pop $R3 ; Pop exit code
 	StrCpy $R2 "$R2.exe"
 	
 	; Fetch runtime installer
@@ -206,18 +207,21 @@
 	!insertmacro DotNetCorePSExec $R1 $R1
 	; $R1 contains powershell script result
 
-	; todo error handling for PS result
+	; todo error handling for PS result, verify download result
 
 	DetailPrint "Download complete"
 
-	DetailPrint "Installing dotnet ${Version}"
+	DetailPrint "Installing dotnet $R0"
 	ExecWait "$\"$R2$\" /install /quiet /norestart" $R1
 	DetailPrint "Installer completed (Result: $R1)"
 
 	nsExec::Exec 'cmd.exe /c del "$R2"'	; Not using Delete to avoid spam in details log
-	Pop $R0 ; Pop exit code
+	Pop $R3 ; Pop exit code
 
-	; Error checking? Verify download result?
+	; Error checking? Verify install result?
+
+	; Restore registers
+	Pop $R3
 	Pop $R2
 	Pop $R1
 	Pop $R0
