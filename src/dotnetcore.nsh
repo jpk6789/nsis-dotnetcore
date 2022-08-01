@@ -77,8 +77,8 @@ DetailPrint "Fetching Latest Version of dotnet core ${Version} from $0"
 ; Fetch latest version of the desired dotnet version
 ; todo error handling in the PS script? so we can check for errors here
 StrCpy $1 "Write-Host (Invoke-WebRequest -UseBasicParsing -URI $\"$0$\").Content;"
-!insertmacro DotNetCorePSExec $1
-Pop $2 ; $2 contains latest version, e.g. 6.0.7
+!insertmacro DotNetCorePSExec $1 $2
+; $2 contains latest version, e.g. 6.0.7
 
 ; todo error handling here
 
@@ -105,8 +105,8 @@ Push $1
 DetailPrint "Checking installed version of dotnet core ${Version}"
 
 StrCpy $0 "dotnet --list-runtimes | % { if($$_ -match $\".*WindowsDesktop.*(${Version}.\d+).*$\") { $$matches[1] } } | Sort-Object {[int]($$_ -replace '\d.\d.(\d+)', '$$1')} -Descending | Select-Object -first 1"
-!insertmacro DotNetCorePSExec $0
-Pop $1 ; $1 contains highest installed version, e.g. 6.0.7
+!insertmacro DotNetCorePSExec $0 $1
+; $1 contains highest installed version, e.g. 6.0.7
 
 ${TrimNewLines} $1 $1
 
@@ -166,8 +166,8 @@ DetailPrint "Downloading dotnet ${Version} from $R1"
 ; Fetch runtime installer
 ; todo error handling in the PS script? so we can check for errors here
 StrCpy $R2 "Invoke-WebRequest -UseBasicParsing -URI $\"$R1$\" -OutFile $\"$R0$\""
-!insertmacro DotNetCorePSExec $R2
-Pop $R2 ; $R2 contains powershell script result
+!insertmacro DotNetCorePSExec $R2 $R2
+; $R2 contains powershell script result
 
 DetailPrint "Download complete"
 
@@ -186,44 +186,68 @@ Pop $R0
 !macroend
 
 ; below is adapted from https://nsis.sourceforge.io/PowerShell_support but avoids using the plugin
-; directory in favour of a temp file. Methods renamed to avoid conflicting with use of the original
-; macros
+; directory in favour of a temp file and providing a return variable rather than returning on the
+; stack. Methods renamed to avoid conflicting with use of the original macros
 
-!macro DotNetCorePSExec PSCommand
+; DotNetCorePSExec
+; Executes a powershell script
+;
+; \param[in] PSCommand The powershell command or script to execute
+; \param[out] Result The output from the powershell script
+!macro DotNetCorePSExec PSCommand Result
 
-  ; Write the command into a temp file
+  ; Save variables
   Push $R0
   Push $R1
-  
+  Push $R2
+
+  ; Push and pop parameters so we don't have conflicts if ${PSCommand} is $R0-2
+  Push ${PSCommand}
+  Pop $R0 ; Powershell command
+
+  ; Write the command into a temp file
   ; Note: Using GetTempFileName to get a temp file name, but since we need to have a .ps1 extension
   ; on the end we rename it with an extra file extension
-  GetTempFileName $R0
-  Rename $R0 "$R0.ps1"
-  StrCpy $R0 "$R0.ps1"
+  GetTempFileName $R1
+  Rename $R1 "$R1.ps1"
+  StrCpy $R1 "$R1.ps1"
 
-  FileOpen $R1 $R0 w
-  FileWrite $R1 "${PSCommand}"
-  FileClose $R1
+  FileOpen $R2 $R1 w
+  FileWrite $R2 $R0
+  FileClose $R2
+
+  ; Execute the powershell script and delete the temp file
+  !insertmacro DotNetCorePSExecFile $R1
+  Delete $R1
+
+  ; Restore registers
+  Exch
+  Pop $R2
+  Exch
   Pop $R1
- 
-  !insertmacro DotNetCorePSExecFile $R0
-  
-  Delete $R0
   Exch
   Pop $R0
+
+  ; Fetch result
+  Pop ${Result}
+
 !macroend
- 
+
+; DotNetCorePSExecFile
+; Executes a powershell file
+;
+; \param[in] FilePath The path to the powershell script file to execute
 !macro DotNetCorePSExecFile FilePath
   !define PSExecID ${__LINE__}
   Push $R0
- 
+
   nsExec::ExecToStack 'powershell -inputformat none -ExecutionPolicy RemoteSigned -File "${FilePath}"  '
- 
+
   Pop $R0 ;return value is first on stack
   ;script output is second on stack, leave on top of it
   IntCmp $R0 0 finish_${PSExecID}
   SetErrorLevel 2
- 
+
 finish_${PSExecID}:
   Exch ;now $R0 on top of stack, followed by script output
   Pop $R0
