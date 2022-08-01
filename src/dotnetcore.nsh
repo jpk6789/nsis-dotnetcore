@@ -175,42 +175,42 @@
 
 !macro DotNetCoreInstallVersion Version
 
-Push $R0
-Push $R1
-Push $R2
+	Push $R0
+	Push $R1
+	Push $R2
 
-GetTempFileName $R0
-Rename $R0 "$R0.exe"
-StrCpy $R0 "$R0.exe"
+	GetTempFileName $R0
+	nsExec::Exec 'cmd.exe /c rename "$R0" "$R0.exe"'	; Not using Rename to avoid spam in details log
+	StrCpy $R0 "$R0.exe"
 
-; todo can download as a .zip, which is smaller, then we'd need to unzip it before running it...
-StrCpy $R1 https://dotnetcli.azureedge.net/dotnet/WindowsDesktop/${Version}/windowsdesktop-runtime-${Version}-win-x64.exe
-DetailPrint "Downloading dotnet ${Version} from $R1"
+	; todo can download as a .zip, which is smaller, then we'd need to unzip it before running it...
+	StrCpy $R1 https://dotnetcli.azureedge.net/dotnet/WindowsDesktop/${Version}/windowsdesktop-runtime-${Version}-win-x64.exe
+	DetailPrint "Downloading dotnet ${Version} from $R1"
 
-;$PayloadURL = "$AzureFeed/WindowsDesktop/$SpecificVersion/windowsdesktop-runtime-$SpecificProductVersion-win-$CLIArchitecture.zip"
+	;$PayloadURL = "$AzureFeed/WindowsDesktop/$SpecificVersion/windowsdesktop-runtime-$SpecificProductVersion-win-$CLIArchitecture.zip"
 
-;below v5
-;$PayloadURL = "$AzureFeed/Runtime/$SpecificVersion/windowsdesktop-runtime-$SpecificProductVersion-win-$CLIArchitecture.zip"
+	;below v5
+	;$PayloadURL = "$AzureFeed/Runtime/$SpecificVersion/windowsdesktop-runtime-$SpecificProductVersion-win-$CLIArchitecture.zip"
 
-; Fetch runtime installer
-; todo error handling in the PS script? so we can check for errors here
-StrCpy $R2 "Invoke-WebRequest -UseBasicParsing -URI $\"$R1$\" -OutFile $\"$R0$\""
-!insertmacro DotNetCorePSExec $R2 $R2
-; $R2 contains powershell script result
+	; Fetch runtime installer
+	; todo error handling in the PS script? so we can check for errors here
+	StrCpy $R2 "Invoke-WebRequest -UseBasicParsing -URI $\"$R1$\" -OutFile $\"$R0$\""
+	!insertmacro DotNetCorePSExec $R2 $R2
+	; $R2 contains powershell script result
 
-DetailPrint "Download complete"
+	DetailPrint "Download complete"
 
-DetailPrint "Installing dotnet ${Version}"
-ExecWait "$\"$R0$\" /install /quiet /norestart" $R2
-DetailPrint "Installer completed (Result: $R2)"
+	DetailPrint "Installing dotnet ${Version}"
+	ExecWait "$\"$R0$\" /install /quiet /norestart" $R2
+	DetailPrint "Installer completed (Result: $R2)"
 
-Delete $R0
+	nsExec::Exec 'cmd.exe /c del "$R0"'	; Not using Delete to avoid spam in details log
 
-; Error checking? Verify download result?
+	; Error checking? Verify download result?
 
-Pop $R2
-Pop $R1
-Pop $R0
+	Pop $R2
+	Pop $R1
+	Pop $R0
 
 !macroend
 
@@ -255,7 +255,7 @@ Function DotNetCorePSExecFn
 	; Note: Using GetTempFileName to get a temp file name, but since we need to have a .ps1 extension
 	; on the end we rename it with an extra file extension
 	GetTempFileName $R1
-	Rename $R1 "$R1.ps1"
+	nsExec::Exec 'cmd.exe /c rename "$R1" "$R1.ps1"'	; Not using Rename to avoid spam in details log
 	StrCpy $R1 "$R1.ps1"
 
 	FileOpen $R2 $R1 w
@@ -265,7 +265,7 @@ Function DotNetCorePSExecFn
 	; Execute the powershell script and delete the temp file
 	Push $R1
 	Call DotNetCorePSExecFileFn
-	Delete $R1
+	nsExec::Exec 'cmd.exe /c del "$R1"'	; Not using Delete to avoid spam in details log
 
 	; Restore registers
 	Exch
