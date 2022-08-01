@@ -15,46 +15,57 @@
 ;
 ; \param Version The desired dotnet core runtime version as a 2 digit version. e.g. 3.1, 5.0, 6.0
 !macro CheckDotNetCore Version
-!define ID ${__LINE__}
 
-; Check current installed version
-!insertmacro DotNetCoreGetInstalledVersion ${Version}
-Pop $0
+	; Save registers
+	Push $R0
+	Push $R1
+	Push $R2
 
-; If $0 is blank then there is no version installed, otherwise it is installed
-; todo in future we might want to support "must be at least 6.0.7", for now we only deal with "yes/no" for a major version (e.g. 6.0)
-StrCmp $0 "" notinstalled_${ID}
-DetailPrint "dotnet version $0 already installed"
-Goto end_${ID}
+	; Push and pop parameters so we don't have conflicts if parameters are $R#
+	Push ${Version}
+	Pop $R0 ; Version
 
-notinstalled_${ID}:
-DetailPrint "dotnet ${Version} is not installed"
+	!define ID ${__LINE__}
 
-!insertmacro DotNetCoreGetLatestVersion ${Version}
-Pop $0
+	; Check current installed version
+	!insertmacro DotNetCoreGetInstalledVersion $R0 $R1
 
-DetailPrint "Latest Version of ${Version} is $0"
+	; If $R1 is blank then there is no version installed, otherwise it is installed
+	; todo in future we might want to support "must be at least 6.0.7", for now we only deal with "yes/no" for a major version (e.g. 6.0)
+	StrCmp $R1 "" notinstalled_${ID}
+	DetailPrint "dotnet version $R1 already installed"
+	Goto end_${ID}
 
+	notinstalled_${ID}:
+	DetailPrint "dotnet $R0 is not installed"
 
-; Get number of input digits
-; ${WordFind} $0 "." "#" $R0
-; DetailPrint "version parts count is $R0"
-
-; ${WordFind} $0 "." "+1" $R1
-; DetailPrint "version part 1 is $R1"
-
-; ${WordFind} $0 "." "+2" $R2
-; DetailPrint "version part 2 is $R2"
-
-; ${WordFind} $0 "." "+3" $R3
-; DetailPrint "version part 3 is $R3"
-
-!insertmacro DotNetCoreInstallVersion $0
+	!insertmacro DotNetCoreGetLatestVersion $R0 $R1
+	DetailPrint "Latest Version of $R0 is $R1"
 
 
-end_${ID}:
+	; Get number of input digits
+	; ${WordFind} $R1 "." "#" $R2
+	; DetailPrint "version parts count is $R2"
 
-!undef ID
+	; ${WordFind} $R1 "." "+1" $R2
+	; DetailPrint "version part 1 is $R2"
+
+	; ${WordFind} $R1 "." "+2" $R2
+	; DetailPrint "version part 2 is $R2"
+
+	; ${WordFind} $R1 "." "+3" $R2
+	; DetailPrint "version part 3 is $R2"
+
+	!insertmacro DotNetCoreInstallVersion $R1
+
+	end_${ID}:
+	!undef ID
+
+	; Restore registers
+	Pop $R2
+	Pop $R1
+	Pop $R0
+
 !macroend
 
 
@@ -62,85 +73,103 @@ end_${ID}:
 ; Gets the latest version of the runtime for a specified dotnet version. This uses the same endpoint
 ; as the dotnet-install scripts to determine the latest full version of a dotnet version
 ;
-; \param Version The desired dotnet core runtime version as a 2 digit version. e.g. 3.1, 5.0, 6.0
-;
-; \returns The full version number of the latest version - e.g. 6.0.7
-!macro DotNetCoreGetLatestVersion Version
+; \param[in] Version The desired dotnet core runtime version as a 2 digit version. e.g. 3.1, 5.0, 6.0
+; \param[out] Result The full version number of the latest version - e.g. 6.0.7
+!macro DotNetCoreGetLatestVersion Version Result
 
-Push $0
-Push $1
-Push $2
+	; Save registers
+	Push $R0
+	Push $R1
+	Push $R2
 
-StrCpy $0 https://dotnetcli.azureedge.net/dotnet/WindowsDesktop/${Version}/latest.version
-DetailPrint "Fetching Latest Version of dotnet core ${Version} from $0"
+	; Push and pop parameters so we don't have conflicts if parameters are $R#
+	Push ${Version}
+	Pop $R0 ; Version
 
-; Fetch latest version of the desired dotnet version
-; todo error handling in the PS script? so we can check for errors here
-StrCpy $1 "Write-Host (Invoke-WebRequest -UseBasicParsing -URI $\"$0$\").Content;"
-!insertmacro DotNetCorePSExec $1 $2
-; $2 contains latest version, e.g. 6.0.7
+	StrCpy $R1 https://dotnetcli.azureedge.net/dotnet/WindowsDesktop/$R0/latest.version
+	DetailPrint "Querying latest version of dotnet $R0 from $R1"
 
-; todo error handling here
+	; Fetch latest version of the desired dotnet version
+	; todo error handling in the PS script? so we can check for errors here
+	StrCpy $R2 "Write-Host (Invoke-WebRequest -UseBasicParsing -URI $\"$R1$\").Content;"
+	!insertmacro DotNetCorePSExec $R2 $R2
+	; $R2 contains latest version, e.g. 6.0.7
 
-; Push the result back onto the stack
-${TrimNewLines} $2 $2
-Push $2
+	; todo error handling here
 
-; Restore $0-2
-Exch
-Pop $2
-Exch
-Pop $1
-Exch
-Pop $0
+	; Push the result onto the stack
+	${TrimNewLines} $R2 $R2
+	Push $R2
+
+	; Restore registers
+	Exch
+	Pop $R2
+	Exch
+	Pop $R1
+	Exch
+	Pop $R0
+
+	; Set result
+	Pop ${Result}
 
 !macroend
 
-!macro DotNetCoreGetInstalledVersion Version
-!define DNC_INS_ID ${__LINE__}
+!macro DotNetCoreGetInstalledVersion Version Result
+	!define DNC_INS_ID ${__LINE__}
 
-Push $0
-Push $1
+	; Save registers
+	Push $R0
+	Push $R1
+	Push $R2
 
-DetailPrint "Checking installed version of dotnet core ${Version}"
+	; Push and pop parameters so we don't have conflicts if parameters are $R#
+	Push ${Version}
+	Pop $R0 ; Version
 
-StrCpy $0 "dotnet --list-runtimes | % { if($$_ -match $\".*WindowsDesktop.*(${Version}.\d+).*$\") { $$matches[1] } } | Sort-Object {[int]($$_ -replace '\d.\d.(\d+)', '$$1')} -Descending | Select-Object -first 1"
-!insertmacro DotNetCorePSExec $0 $1
-; $1 contains highest installed version, e.g. 6.0.7
+	DetailPrint "Checking installed version of dotnet $R0"
 
-${TrimNewLines} $1 $1
+	StrCpy $R1 "dotnet --list-runtimes | % { if($$_ -match $\".*WindowsDesktop.*($R0.\d+).*$\") { $$matches[1] } } | Sort-Object {[int]($$_ -replace '\d.\d.(\d+)', '$$1')} -Descending | Select-Object -first 1"
+	!insertmacro DotNetCorePSExec $R1 $R1
+	; $R1 contains highest installed version, e.g. 6.0.7
 
-; If there is an installed version it should start with the same two "words" as the input version,
-; otherwise assume we got an error response
+	${TrimNewLines} $R1 $R1
 
-; todo improve this simple test which checks there are at least 3 "words" separated by periods
-${WordFind} $1 "." "E#" $0
-IfErrors error_${DNC_INS_ID}
+	; If there is an installed version it should start with the same two "words" as the input version,
+	; otherwise assume we got an error response
 
-; If less than 3 "words", error
-IntCmp $0 3 0 error_${DNC_INS_ID}
+	; todo improve this simple test which checks there are at least 3 "words" separated by periods
+	${WordFind} $R1 "." "E#" $R2
+	IfErrors error_${DNC_INS_ID}
+	; $R2 contains number of version parts in R1 (dot separated words = version parts)
 
-; If more than 4 "words", error
-IntCmp $0 4 0 0 error_${DNC_INS_ID}
+	; If less than 3 parts, or more than 4 parts, error
+	IntCmp $R2 3 0 error_${DNC_INS_ID}
+	IntCmp $R2 4 0 0 error_${DNC_INS_ID}
 
-Goto end_${DNC_INS_ID}
+	; todo more error handling here / validation
 
-; todo error handling here
+	; Seems to be OK, skip the "set to blank string" error handler
+	Goto end_${DNC_INS_ID}
 
-error_${DNC_INS_ID}:
-StrCpy $1 "" ; Set result to blank string if any error occurs (means not installed)
+	error_${DNC_INS_ID}:
+	StrCpy $R1 "" ; Set result to blank string if any error occurs (means not installed)
 
-end_${DNC_INS_ID}:
-!undef DNC_INS_ID
+	end_${DNC_INS_ID}:
+	!undef DNC_INS_ID
 
-; Push the result back onto the stack
-Push $1
+	; Push the result onto the stack
+	Push $R1
 
-; Restore $0-1
-Exch
-Pop $1
-Exch
-Pop $0
+	; Restore registers
+	Exch
+	Pop $R2
+	Exch
+	Pop $R1
+	Exch
+	Pop $R0
+
+	; Set result
+	Pop ${Result}
 
 !macroend
 
@@ -196,12 +225,12 @@ Pop $R0
 ; \param[out] Result The output from the powershell script
 !macro DotNetCorePSExec PSCommand Result
 
-  ; Save variables
+  ; Save registers
   Push $R0
   Push $R1
   Push $R2
 
-  ; Push and pop parameters so we don't have conflicts if ${PSCommand} is $R0-2
+  ; Push and pop parameters so we don't have conflicts if parameters are $R#
   Push ${PSCommand}
   Pop $R0 ; Powershell command
 
@@ -228,7 +257,7 @@ Pop $R0
   Exch
   Pop $R0
 
-  ; Fetch result
+  ; Set result
   Pop ${Result}
 
 !macroend
