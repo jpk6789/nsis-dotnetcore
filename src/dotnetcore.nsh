@@ -221,11 +221,14 @@
 	${WordFind} $R1 "BlobNotFound" "E+1{" $R3
 	ifErrors +3 0
 	DetailPrint "Dotnet installer $R0 not found."
-	Goto +5
+	Goto +10
 
 	; todo error handling for PS result, verify download result
 
 	
+	IfFileExists $R2 +3, 0
+	DetailPrint "Dotnet installer did not download."
+	Goto +7
 
 	DetailPrint "Download complete"
 
