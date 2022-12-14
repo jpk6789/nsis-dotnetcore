@@ -218,7 +218,14 @@
 	!insertmacro DotNetCorePSExec $R1 $R1
 	; $R1 contains powershell script result
 
+	${WordFind} $R1 "BlobNotFound" "E+1{" $R3
+	ifErrors +3 0
+	DetailPrint "Dotnet installer $R0 not found."
+	Goto +5
+
 	; todo error handling for PS result, verify download result
+
+	
 
 	DetailPrint "Download complete"
 
