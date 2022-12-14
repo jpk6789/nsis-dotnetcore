@@ -6,6 +6,7 @@
 
 !include "WordFunc.nsh"
 !include "TextFunc.nsh"
+!include "X64.nsh"
 
 !ifndef DOTNETCORE_INCLUDED
 !define DOTNETCORE_INCLUDED
@@ -185,13 +186,23 @@
 	Push ${Version}
 	Pop $R0 ; Version
 
+	${If} ${IsNativeAMD64}
+		StrCpy $R3 "x64"
+	${ElseIf} ${IsNativeARM64}
+		StrCpy $R3 "arm64"
+	${ElseIf} ${IsNativeIA32}
+		StrCpy $R3 "x86"
+	${Else}
+		StrCpy $R3 "unknown"
+	${EndIf}
+
 	; todo can download as a .zip, which is smaller, then we'd need to unzip it before running it...
-	StrCpy $R1 https://dotnetcli.azureedge.net/dotnet/WindowsDesktop/$R0/windowsdesktop-runtime-$R0-win-x64.exe
+	StrCpy $R1 https://dotnetcli.azureedge.net/dotnet/WindowsDesktop/$R0/windowsdesktop-runtime-$R0-win-$R3.exe
 
 	; For dotnet versions less than 5 the WindowsDesktop runtime has a different path
 	${WordFind} $R0 "." "+1" $R2
 	IntCmp $R2 5 +2 0 +2
-	StrCpy $R1 https://dotnetcli.azureedge.net/dotnet/Runtime/$R0/windowsdesktop-runtime-$R0-win-x64.exe
+	StrCpy $R1 https://dotnetcli.azureedge.net/dotnet/Runtime/$R0/windowsdesktop-runtime-$R0-win-$R3.exe
 
 	DetailPrint "Downloading dotnet $R0 from $R1"
 
