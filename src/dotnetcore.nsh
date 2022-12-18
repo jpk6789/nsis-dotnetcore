@@ -1,5 +1,5 @@
 ; A set of NSIS macros to check whether a dotnet core runtime is installed and, if not, offer to
-; download and install it. Currently only supports dotnet 6.
+; download and install it. Supports dotnet versions 3.1 and newer - latest tested version is 7.0.
 ;
 ; Inspired by & initially based on NsisDotNetChecker, which does the same thing for .NET framework
 ; https://github.com/alex-sitnikov/NsisDotNetChecker
@@ -14,7 +14,7 @@
 ; Check that a specific version of the dotnet core runtime is installed and, if not, attempts to
 ; install it
 ;
-; \param Version The desired dotnet core runtime version as a 2 digit version. e.g. 3.1, 5.0, 6.0
+; \param Version The desired dotnet core runtime version as a 2 digit version. e.g. 3.1, 6.0, 7.0
 !macro CheckDotNetCore Version
 
 	; Save registers
@@ -74,7 +74,7 @@
 ; Gets the latest version of the runtime for a specified dotnet version. This uses the same endpoint
 ; as the dotnet-install scripts to determine the latest full version of a dotnet version
 ;
-; \param[in] Version The desired dotnet core runtime version as a 2 digit version. e.g. 3.1, 5.0, 6.0
+; \param[in] Version The desired dotnet core runtime version as a 2 digit version. e.g. 3.1, 6.0, 7.0
 ; \param[out] Result The full version number of the latest version - e.g. 6.0.7
 !macro DotNetCoreGetLatestVersion Version Result
 

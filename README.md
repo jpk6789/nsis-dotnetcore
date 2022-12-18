@@ -3,14 +3,11 @@
 This repository contains macro scripts intended to check whether a particular version of the dotnet
 core runtime is installed and, if not, install it.
 
-Very rough'n'ready at the moment with almost noerror handling and currently only supports installing
-the WindowsDesktop runtime. Needs better UI feedback, possibly automatically switching to using
-[Inetc](https://nsis.sourceforge.io/Inetc_plug-in) to perform the download with progress when the
-plugin is available, and would probably benefit from a 'would you like to install... " prompt
+Currently only supports installing the `Windows Desktop` runtime. Support for the core runtime only,
+or for `ASP.NET Core` runtime, is not currently implemented.
 
-Would also be good to handle a three digit version as a "minimum" or "exact" version in future,
-possibly using > as a prefix for "minimum". Right now it just makes sure _any_ version of the
-specified runtime is installed.
+The platform will be detected during installation and the appropriate runtime installer will be used.
+Supports `ARM64`, `X86` and `X86` platforms.
 
 # Usage
 
@@ -25,4 +22,5 @@ dotnet is installed
 !insertmacro CheckDotNetCore 3.1
 !insertmacro CheckDotNetCore 5.0
 !insertmacro CheckDotNetCore 6.0
+!insertmacro CheckDotNetCore 7.0
 ```
