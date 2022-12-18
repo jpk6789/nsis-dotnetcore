@@ -3,8 +3,11 @@
 This repository contains macro scripts intended to check whether a particular version of the dotnet
 core runtime is installed and, if not, install it.
 
-Currently only supports installing the appropriate WindowsDesktop runtime for the platform the
-installer is running on (ARM64, X86 or X86).
+Currently only supports installing the `Windows Desktop` runtime. Support for the core runtime only,
+or for `ASP.NET Core` runtime, is not currently implemented.
+
+The platform will be detected during installation and the appropriate runtime installer will be used.
+Supports `ARM64`, `X86` and `X86` platforms.
 
 # Usage
 
