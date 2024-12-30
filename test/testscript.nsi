@@ -28,36 +28,71 @@ Section "Dummy Section" SecDummy
 
   SetOutPath "$INSTDIR"
 
-  !insertmacro DotNetCoreGetLatestVersion 8.0 $0
-  DetailPrint "Latest Version of 8.0 is $0"
+  !insertmacro RuntimeGetLatestVersion "DotNetCore" 9.0 $0
+  DetailPrint "Latest Version of DotNetCore 9.0 is $0"
 
-  !insertmacro DotNetCoreGetInstalledVersion 8.0 $0
-  DetailPrint "Installed Version of 8.0 is $0"
+  !insertmacro RuntimeGetInstalledVersion "DotNetCore" 9.0 $0
+  DetailPrint "Installed Version of DotNetCore 9.0 is $0"
 
-  !insertmacro CheckDotNetCore 8.0
+  !insertmacro CheckRuntime "DotNetCore" 9.0 ""
 
-  !insertmacro AspNetCoreGetLatestVersion 8.0 $0
-  DetailPrint "Latest Version of 8.0 is $0"
+; -----------------------------------------------------------
 
-  !insertmacro AspNetCoreGetInstalledVersion 8.0 $0
-  DetailPrint "Installed Version of 8.0 is $0"
+  !insertmacro RuntimeGetLatestVersion "AspNetCore" 9.0 $0
+  DetailPrint "Latest Version of AspNetCore 9.0 is $0"
 
-  !insertmacro CheckAspNetCore 8.0
+  !insertmacro RuntimeGetInstalledVersion "AspNetCore" 9.0 $0
+  DetailPrint "Installed Version of AspNetCore 9.0 is $0"
+
+  !insertmacro CheckRuntime "AspNetCore" 9.0 ""
   
-  !insertmacro WindowsDesktopGetLatestVersion 3.1 $0
-  DetailPrint "Latest Version of 3.1 is $0"
+; -----------------------------------------------------------
 
-  !insertmacro WindowsDesktopGetInstalledVersion 3.1 $0
-  DetailPrint "Installed Version of 3.1 is $0"
+  !insertmacro RuntimeGetLatestVersion "WindowsDesktop" 3.1 $0
+  DetailPrint "Latest Version of WindowsDesktop 3.1 is $0"
 
-  !insertmacro WindowsDesktopGetLatestVersion 8.0 $0
-  DetailPrint "Latest Version of 8.0 is $0"
+  !insertmacro RuntimeGetInstalledVersion "WindowsDesktop" 3.1 $0
+  DetailPrint "Installed Version of WindowsDesktop 3.1 is $0"
 
-  !insertmacro WindowsDesktopGetInstalledVersion 8.0 $0
-  DetailPrint "Installed Version of 8.0 is $0"
+  !insertmacro RuntimeGetLatestVersion "WindowsDesktop" 9.0 $0
+  DetailPrint "Latest Version of WindowsDesktop 9.0 is $0"
+
+  !insertmacro RuntimeGetInstalledVersion "WindowsDesktop" 9.0 $0
+  DetailPrint "Installed Version of WindowsDesktop 9.0 is $0"
    
-  !insertmacro CheckWindowsDesktop 3.1
-  !insertmacro CheckWindowsDesktop 8.0
+  !insertmacro CheckRuntime "WindowsDesktop" 3.1 ""
+  !insertmacro CheckRuntime "WindowsDesktop" 9.0 ""
+
+  ; !insertmacro DotNetCoreGetLatestVersion 6.0 $0
+  ; DetailPrint "Latest Version of 6.0 is $0"
+
+  ; !insertmacro DotNetCoreGetInstalledVersion 6.0 $0
+  ; DetailPrint "Installed Version of 6.0 is $0"
+
+  ; !insertmacro CheckDotNetCore 6.0
+
+  ; !insertmacro AspNetCoreGetLatestVersion 6.0 $0
+  ; DetailPrint "Latest Version of 6.0 is $0"
+
+  ; !insertmacro AspNetCoreGetInstalledVersion 6.0 $0
+  ; DetailPrint "Installed Version of 6.0 is $0"
+
+  ; !insertmacro CheckAspNetCore 6.0
+  
+  ; !insertmacro WindowsDesktopGetLatestVersion 3.1 $0
+  ; DetailPrint "Latest Version of 3.1 is $0"
+
+  ; !insertmacro WindowsDesktopGetInstalledVersion 3.1 $0
+  ; DetailPrint "Installed Version of 3.1 is $0"
+
+  ; !insertmacro WindowsDesktopGetLatestVersion 6.0 $0
+  ; DetailPrint "Latest Version of 6.0 is $0"
+
+  ; !insertmacro WindowsDesktopGetInstalledVersion 6.0 $0
+  ; DetailPrint "Installed Version of 6.0 is $0"
+   
+  ; !insertmacro CheckWindowsDesktop 3.1
+  ; !insertmacro CheckWindowsDesktop 6.0
 
   WriteRegStr HKCU "Software\DotNetCore Test" "" $INSTDIR
   WriteUninstaller "$INSTDIR\Uninstall.exe"
