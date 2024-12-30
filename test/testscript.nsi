@@ -21,12 +21,17 @@ RequestExecutionLevel admin
   
 !insertmacro MUI_LANGUAGE "English"
 
-;--------------------------------
+; -----------------------------------------------------------
 ;Installer Sections
+; -----------------------------------------------------------
 
 Section "Dummy Section" SecDummy
 
   SetOutPath "$INSTDIR"
+
+; -----------------------------------------------------------
+; DotNetCore
+; -----------------------------------------------------------
 
   !insertmacro RuntimeGetLatestVersion "DotNetCore" 9.0 $0
   DetailPrint "Latest Version of DotNetCore 9.0 is $0"
@@ -37,6 +42,8 @@ Section "Dummy Section" SecDummy
   !insertmacro CheckRuntime "DotNetCore" 9.0 ""
 
 ; -----------------------------------------------------------
+; AspNetCore
+; -----------------------------------------------------------
 
   !insertmacro RuntimeGetLatestVersion "AspNetCore" 9.0 $0
   DetailPrint "Latest Version of AspNetCore 9.0 is $0"
@@ -46,6 +53,8 @@ Section "Dummy Section" SecDummy
 
   !insertmacro CheckRuntime "AspNetCore" 9.0 ""
   
+; -----------------------------------------------------------
+; WindowsDesktop
 ; -----------------------------------------------------------
 
   !insertmacro RuntimeGetLatestVersion "WindowsDesktop" 3.1 $0
@@ -63,36 +72,25 @@ Section "Dummy Section" SecDummy
   !insertmacro CheckRuntime "WindowsDesktop" 3.1 ""
   !insertmacro CheckRuntime "WindowsDesktop" 9.0 ""
 
-  ; !insertmacro DotNetCoreGetLatestVersion 6.0 $0
-  ; DetailPrint "Latest Version of 6.0 is $0"
+; -----------------------------------------------------------
+; Backwards Compatibility
+; -----------------------------------------------------------
 
-  ; !insertmacro DotNetCoreGetInstalledVersion 6.0 $0
-  ; DetailPrint "Installed Version of 6.0 is $0"
+  !insertmacro DotNetCoreGetLatestVersion 6.0 $0
+  DetailPrint "Latest Version of 6.0 is $0"
 
-  ; !insertmacro CheckDotNetCore 6.0
+  !insertmacro DotNetCoreGetInstalledVersion 6.0 $0
+  DetailPrint "Installed Version of 6.0 is $0"
 
-  ; !insertmacro AspNetCoreGetLatestVersion 6.0 $0
-  ; DetailPrint "Latest Version of 6.0 is $0"
+  !insertmacro CheckDotNetCore 6.0
 
-  ; !insertmacro AspNetCoreGetInstalledVersion 6.0 $0
-  ; DetailPrint "Installed Version of 6.0 is $0"
+  !insertmacro AspNetCoreGetLatestVersion 6.0 $0
+  DetailPrint "Latest Version of 6.0 is $0"
 
-  ; !insertmacro CheckAspNetCore 6.0
-  
-  ; !insertmacro WindowsDesktopGetLatestVersion 3.1 $0
-  ; DetailPrint "Latest Version of 3.1 is $0"
+  !insertmacro AspNetCoreGetInstalledVersion 6.0 $0
+  DetailPrint "Installed Version of 6.0 is $0"
 
-  ; !insertmacro WindowsDesktopGetInstalledVersion 3.1 $0
-  ; DetailPrint "Installed Version of 3.1 is $0"
-
-  ; !insertmacro WindowsDesktopGetLatestVersion 6.0 $0
-  ; DetailPrint "Latest Version of 6.0 is $0"
-
-  ; !insertmacro WindowsDesktopGetInstalledVersion 6.0 $0
-  ; DetailPrint "Installed Version of 6.0 is $0"
-   
-  ; !insertmacro CheckWindowsDesktop 3.1
-  ; !insertmacro CheckWindowsDesktop 6.0
+  !insertmacro CheckAspNetCore 6.0
 
   WriteRegStr HKCU "Software\DotNetCore Test" "" $INSTDIR
   WriteUninstaller "$INSTDIR\Uninstall.exe"
