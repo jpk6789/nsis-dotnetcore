@@ -29,10 +29,10 @@ determine the target platform based on the system.
 Complete commands look like the following:
 ```
 !insertmacro CheckRuntime "DotNetCore" 3.1 ""
-!insertmacro CheckRuntime "AspNetCore" 3.1 "x64"
 !insertmacro CheckRuntime "AspNetCore" 3.1 ""
+!insertmacro CheckRuntime "AspNetCore" 3.1 "x64"
 !insertmacro CheckRuntime "WindowsDesktop" 3.1 ""
-!insertmacro CheckRuntime "WindowsDesktop" 3.1 ""
+!insertmacro CheckRuntime "WindowsDesktop" 3.1 "x86"
 ...
 ```
 
