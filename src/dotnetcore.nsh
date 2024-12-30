@@ -290,7 +290,7 @@
 	Pop $R0 ; Version
 
 	StrCpy $R1 https://dotnetcli.azureedge.net/dotnet/WindowsDesktop/$R0/latest.version
-	DetailPrint "Querying latest version of dotnet $R0 from $R1"
+	DetailPrint "Querying latest version of WindowsDesktop runtime $R0 from $R1"
 
 	; Fetch latest version of the desired dotnet version
 	; todo error handling in the PS script? so we can check for errors here
@@ -447,7 +447,7 @@
 	Push ${Version}
 	Pop $R0 ; Version
 
-	DetailPrint "Checking installed version of dotnet $R0"
+	DetailPrint "Checking installed version of WindowsDesktop runtime $R0"
 
 	StrCpy $R1 "dotnet --list-runtimes | % { if($$_ -match $\".*WindowsDesktop.*($R0.\d+).*$\") { $$matches[1] } } | Sort-Object {[int]($$_ -replace '\d.\d.(\d+)', '$$1')} -Descending | Select-Object -first 1"
 	!insertmacro ExecPSScript $R1 $R1
@@ -589,7 +589,7 @@
 	; todo can download as a .zip, which is smaller, then we'd need to unzip it before running it...
 	StrCpy $R1 https://dotnetcli.azureedge.net/dotnet/aspnetcore/Runtime/$R0/dotnet-hosting-$R0-win.exe
 
-	DetailPrint "Downloading dotnet $R0 from $R1"
+	DetailPrint "Downloading AspNetCore $R0 from $R1"
 
 	; Create destination file
 	GetTempFileName $R2
@@ -664,7 +664,7 @@
 	IntCmp $R2 5 +2 0 +2
 	StrCpy $R1 https://dotnetcli.azureedge.net/dotnet/Runtime/$R0/windowsdesktop-runtime-$R0-win-$R3.exe
 
-	DetailPrint "Downloading dotnet $R0 from $R1"
+	DetailPrint "Downloading WindowsDesktop runtime $R0 from $R1"
 
 	; Create destination file
 	GetTempFileName $R2
@@ -680,19 +680,19 @@
 
 	${WordFind} $R1 "BlobNotFound" "E+1{" $R3
 	ifErrors +3 0
-	DetailPrint "Dotnet installer $R0 not found."
+	DetailPrint "WindowsDesktop runtime installer $R0 not found."
 	Goto +10
 
 	; todo error handling for PS result, verify download result
 
 	
 	IfFileExists $R2 +3, 0
-	DetailPrint "Dotnet installer did not download."
+	DetailPrint "WindowsDesktop runtime installer did not download."
 	Goto +7
 
 	DetailPrint "Download complete"
 
-	DetailPrint "Installing dotnet $R0"
+	DetailPrint "Installing WindowsDesktop runtime $R0"
 	ExecWait "$\"$R2$\" /install /quiet /norestart" $R1
 	DetailPrint "Installer completed (Result: $R1)"
 
