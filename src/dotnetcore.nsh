@@ -43,20 +43,6 @@
 	!insertmacro DotNetCoreGetLatestVersion $R0 $R1
 	DetailPrint "Latest Version of $R0 is $R1"
 
-
-	; Get number of input digits
-	; ${WordFind} $R1 "." "#" $R2
-	; DetailPrint "version parts count is $R2"
-
-	; ${WordFind} $R1 "." "+1" $R2
-	; DetailPrint "version part 1 is $R2"
-
-	; ${WordFind} $R1 "." "+2" $R2
-	; DetailPrint "version part 2 is $R2"
-
-	; ${WordFind} $R1 "." "+3" $R2
-	; DetailPrint "version part 3 is $R2"
-
 	!insertmacro DotNetCoreInstallVersion $R1
 
 	end_${ID}:
@@ -101,20 +87,6 @@
 	!insertmacro AspNetCoreGetLatestVersion $R0 $R1
 	DetailPrint "Latest Version of $R0 is $R1"
 
-
-	; Get number of input digits
-	; ${WordFind} $R1 "." "#" $R2
-	; DetailPrint "version parts count is $R2"
-
-	; ${WordFind} $R1 "." "+1" $R2
-	; DetailPrint "version part 1 is $R2"
-
-	; ${WordFind} $R1 "." "+2" $R2
-	; DetailPrint "version part 2 is $R2"
-
-	; ${WordFind} $R1 "." "+3" $R2
-	; DetailPrint "version part 3 is $R2"
-
 	!insertmacro AspNetCoreInstallVersion $R1
 
 	end_${ID}:
@@ -158,20 +130,6 @@
 
 	!insertmacro WindowsDesktopGetLatestVersion $R0 $R1
 	DetailPrint "Latest Version of $R0 is $R1"
-
-
-	; Get number of input digits
-	; ${WordFind} $R1 "." "#" $R2
-	; DetailPrint "version parts count is $R2"
-
-	; ${WordFind} $R1 "." "+1" $R2
-	; DetailPrint "version part 1 is $R2"
-
-	; ${WordFind} $R1 "." "+2" $R2
-	; DetailPrint "version part 2 is $R2"
-
-	; ${WordFind} $R1 "." "+3" $R2
-	; DetailPrint "version part 3 is $R2"
 
 	!insertmacro WindowsDesktopInstallVersion $R1
 
