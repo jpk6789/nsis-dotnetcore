@@ -20,10 +20,10 @@ The structure of the macro command is as following:
 !insertmacro CheckRuntime <Runtime> <Version> <Platform>
 ```
 
-`<Runtime>` must be one of `DotNetCore`, `AspNetCore` or `WindowsDesktop` to specify the desired runtime
+`<Runtime>` must be one of `"DotNetCore"`, `"AspNetCore"` or `"WindowsDesktop"` to specify the desired runtime
 to check and (if necessary) to install. `<Version>` defines the major dotnet release version in a 2 digit
 form (e.g. `3.1`, `6.0` or `7.0`). `<Platform>` is an optional parameter to define the target platform.
-Allowed inputs are `x86`, `x64`, `arm64` and `""` (empty). If this input is empty, the installer will
+Allowed inputs are `"x86"`, `"x64"`, `"arm64"` and `""` (empty). If this input is empty, the installer will
 determine the target platform based on the system.
 
 Complete commands look like the following:
